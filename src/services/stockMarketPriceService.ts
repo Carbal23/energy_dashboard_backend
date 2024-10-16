@@ -1,5 +1,5 @@
 import { AppDataSource } from "../data-source";
-import { MaxDemand } from "../entity/MaxDemand";
+import { StockMarketPrice } from "../entity/StockMarketPrice";
 import axios from "axios";
 import { configDotenv } from "dotenv";
 import {
@@ -10,14 +10,14 @@ import { Codes, parametersPerDay } from "../utils/codes";
 
 configDotenv({ path: "variables.env" });
 
-export class MaxDemandService {
+export class StockMarketPriceService {
   private readonly apiUrl =
-    process.env.API_URL_DAILY || "http://servapibi.xm.com.co/daily"; // URL de la API para demanda máxima
-  private readonly code = Codes.maxDemand; // Código para la demanda máxima
+    process.env.API_URL_DAILY || "http://servapibi.xm.com.co/daily"; // URL de la API para precios de bolsa nacional
+  private readonly code = Codes.stockMarketPrice; // Código para el precio de bolsa nacional
   private readonly maxDays = parametersPerDay.maxDays; // Número máximo de días permitidos por la API
-  private readonly safeDays = parametersPerDay.safeDays; // Número de días seguros para asegurar que la información está disponible
+  private readonly safeDays = parametersPerDay.safeDays; // Número de días seguros
 
-  async checkAndUpdateMaxDemand() {
+  async checkAndUpdatePrice() {
     let lastUpdate = await getLastExecutionDate(this.code);
     const currentDate = new Date();
     const safeDate = new Date(currentDate);
@@ -33,61 +33,61 @@ export class MaxDemandService {
           endDate = safeDate;
         }
 
-        await this.updateMaxDemandData(startDate, endDate);
+        await this.updatePriceData(startDate, endDate);
         lastUpdate.setTime(endDate.getTime() + 86400000); // Incrementar en 1 día
       }
 
-      console.log("Actualización de demanda máxima completada.");
+      console.log("Actualización de precios de bolsa nacional completada.");
 
-      const maxDemandRepository = AppDataSource.getRepository(MaxDemand);
-      await updateLastExecutionDate(this.code, maxDemandRepository);
+      const priceRepository = AppDataSource.getRepository(StockMarketPrice);
+      await updateLastExecutionDate(this.code, priceRepository);
     } else {
-      console.log("Demanda máxima actualizada a fecha de hoy menos 7 días.");
+      console.log("Precios actualizados a fecha de hoy menos 7 días.");
     }
   }
 
-  private async updateMaxDemandData(startDate: Date, endDate: Date) {
+  private async updatePriceData(startDate: Date, endDate: Date) {
     try {
       const formattedStartDate = startDate.toISOString().split("T")[0];
       const formattedEndDate = endDate.toISOString().split("T")[0];
 
       const requestBody = {
-        MetricId: "DemaMaxPot", // Demanda máxima de potencia
+        MetricId: "PPPrecBolsNaci", // Precio Bolsa Nacional Ponderado
         StartDate: formattedStartDate,
         EndDate: formattedEndDate,
         Entity: "Sistema",
       };
 
       const response = await axios.post(this.apiUrl, requestBody);
-      const demandData = response.data.Items;
+      const priceData = response.data.Items;
 
-      const demandRepository = AppDataSource.getRepository(MaxDemand);
-      const promises: Promise<MaxDemand>[] = [];
+      const priceRepository = AppDataSource.getRepository(StockMarketPrice);
+      const promises: Promise<StockMarketPrice>[] = [];
 
-      for (const item of demandData) {
+      for (const item of priceData) {
         const date = item.Date;
 
         for (const entity of item.DailyEntities) {
-          const maxDemand = parseFloat(entity.Value);
+          const price = parseFloat(entity.Value);
 
-          const existingDemand = await demandRepository.findOne({
+          const existingPrice = await priceRepository.findOne({
             where: { date },
           });
 
-          if (!existingDemand) {
-            const newDemand = demandRepository.create({
+          if (!existingPrice) {
+            const newPrice = priceRepository.create({
               date,
-              maxDemand,
+              price,
             });
 
-            promises.push(demandRepository.save(newDemand));
+            promises.push(priceRepository.save(newPrice));
           }
         }
       }
 
       await Promise.all(promises);
     } catch (error) {
-      console.error("Error al actualizar los datos de demanda máxima:", error);
+      console.error("Error al actualizar los datos de precios:", error);
     }
   }
 }

@@ -1,9 +1,11 @@
 import { AppDataSource } from "./data-source"
 import { GenerationService } from "./services/generationService";
 import { MaxDemandService } from "./services/maxDemandService";
+import { MaxOfferPriceService } from "./services/maxOfferPriceService";
 import { RealAvailabilityService } from "./services/realAvailabilityService";
 import { RegionalDemandService } from "./services/regionalDemandService";
 import { ResourceService } from "./services/resourceService";
+import { StockMarketPriceService } from "./services/stockMarketPriceService";
 import { TotalDemandService } from "./services/totalDemandService";
 
 // Función principal que inicializa la base de datos y ejecuta ResourceService
@@ -20,6 +22,8 @@ const main = async () => {
       const totalDemandService = new TotalDemandService();
       const regionalDemandService = new RegionalDemandService;
       const maxDemandService = new MaxDemandService();
+      const stockMarketPriceService = new StockMarketPriceService();
+      const maxOfferPriceService = new MaxOfferPriceService();
 
       await resourceService.checkAndUpdateResources();
 
@@ -32,6 +36,10 @@ const main = async () => {
       await regionalDemandService.checkAndUpdateRegionalDemand();
 
       await maxDemandService.checkAndUpdateMaxDemand();
+
+      await stockMarketPriceService.checkAndUpdatePrice();
+
+      await maxOfferPriceService.checkAndUpdateMaxOfferPrice();
     
       console.log("Proceso de actualizacion completado.");
     } catch (error) {

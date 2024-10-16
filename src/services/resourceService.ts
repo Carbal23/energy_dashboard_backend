@@ -3,13 +3,13 @@ import { Resource } from '../entity/Resource';
 import axios from 'axios';
 import { configDotenv } from "dotenv";
 import { getLastExecutionDate, updateLastExecutionDate } from "../utils/executionLogUtil";
-import { codes } from "../utils/codes";
+import { Codes } from "../utils/codes";
 
 configDotenv({path: 'variables.env'});
 
 export class ResourceService {
     private readonly apiUrl =  process.env.API_URL_METRICS || "https://servapibi.xm.com.co/lists";
-    private readonly code = codes.resource;
+    private readonly code = Codes.resource;
 
     async checkAndUpdateResources() {
         // Verificar si debe actualizar los recursos

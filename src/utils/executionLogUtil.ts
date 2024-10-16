@@ -24,26 +24,6 @@ export async function getLastExecutionDate(code: string): Promise<Date> {
  * @param code Identificador del proceso (por ejemplo, 'RESO' para resource)
  * @param lastUpdate Fecha con la que se actualizara el code en data base
  */
-
-// export async function updateLastExecutionDate(code: string, lastUpdate: Date = new Date()): Promise<void> {
-//     const executionLogRepository = AppDataSource.getRepository(ExecutionLog);
-//     const existingLog = await executionLogRepository.findOne({ where: { code } });
-
-//     if (existingLog) {
-//         // Actualizar la fecha de la última ejecución con la última fecha procesada o con la fecha actual
-//         existingLog.lastExecution = lastUpdate;
-//         await executionLogRepository.save(existingLog);
-//     } else {
-//         // Crear un nuevo registro si no existe
-//         const newLog = executionLogRepository.create({
-//             code,
-//             lastExecution: lastUpdate,
-//         });
-//         await executionLogRepository.save(newLog);
-//     }
-// }
-
-
 // Actualizar la fecha de la última ejecución, con o sin una entidad específica
 export async function updateLastExecutionDate<T>(
   code: string,

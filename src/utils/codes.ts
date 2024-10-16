@@ -1,10 +1,12 @@
-interface Icodes {
-    resource: string;
-    generation: string;
-    availability: string;
-    totalDemand: string;
-    regionalDemand: string;
-    maxDemand: string;
+export enum Codes {
+    resource = "RESO",
+    generation = "GENE",
+    availability = "AVAI",
+    totalDemand = "TDEM",
+    regionalDemand = "REDE",
+    maxDemand = "MADE",
+    stockMarketPrice = "SMPR",
+    maxOfferPrice = "MOPR"
 }
 
 interface IparametersPerDay {
@@ -12,14 +14,6 @@ interface IparametersPerDay {
     safeDays: number;
 }
 
-export const codes: Icodes = {
-    resource: "RESO",
-    generation: "GENE",
-    availability: "AVAI",
-    totalDemand: "TDEM",
-    regionalDemand: "REDE",
-    maxDemand: "MADE"
-}
 
 export const parametersPerDay: IparametersPerDay = {
     maxDays: 31,

@@ -6,14 +6,14 @@ import {
   getLastExecutionDate,
   updateLastExecutionDate,
 } from "../utils/executionLogUtil";
-import { codes, parametersPerDay } from "../utils/codes";
+import { Codes, parametersPerDay } from "../utils/codes";
 
 configDotenv({ path: "variables.env" });
 
 export class RealAvailabilityService {
   private readonly apiUrl =
     process.env.API_URL_HOURLY || "https://servapibi.xm.com.co/hourly"; // URL de la API para disponibilidad
-  private readonly code = codes.availability; // Código para disponibilidad
+  private readonly code = Codes.availability; // Código para disponibilidad
   private readonly maxDays = parametersPerDay.maxDays; // Número máximo de días permitidos por la API
   private readonly safeDays = parametersPerDay.safeDays; // Número de días seguros para asegurar que la información está disponible
 
