@@ -1,0 +1,23 @@
+{
+   "name": "energia-dashboard-backend",
+   "version": "0.0.1",
+   "description": "Awesome project developed with TypeORM.",
+   "type": "commonjs",
+   "devDependencies": {
+      "@types/node": "^22.7.5",
+      "ts-node": "^10.9.2",
+      "typescript": "^5.6.3"
+   },
+   "dependencies": {
+      "axios": "^1.7.7",
+      "dotenv": "^16.4.5",
+      "pg": "^8.4.0",
+      "reflect-metadata": "^0.1.13",
+      "typeorm": "0.3.20"
+   },
+   "scripts": {
+      "start": "tsc && node ./build/index.js",
+      "dev": "ts-node src/index.ts",
+      "typeorm": "typeorm-ts-node-commonjs"
+   }
+}
