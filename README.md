@@ -70,6 +70,90 @@ Sigue los siguientes pasos para configurar y ejecutar el proyecto localmente:
 
 El backend se encarga de consumir la API externa y almacenar los datos transformados en la base de datos. Los servicios principales son ejecutados en el archivo `index.ts`, donde se inicializan las conexiones y se ejecutan los procesos automáticos de actualización.
 
+## Funcionalidades Principales
+1. Almacenamiento de datos históricos de generación y demanda eléctrica.
+2. Análisis de disponibilidad de recursos por región y tipo.
+3. Seguimiento de precios en el mercado eléctrico.
+4. Registro de ejecución de servicios y actualizaciones.
+
+## Estructura de las Entidades
+
+A continuación, se describen los modelos de datos utilizados en el sistema:
+
+### 1. `ExecutionLog`
+Guarda los registros de actualizaciones de servicios para identificar la última ejecución por código.
+- **Columnas**:
+  - `id`: Identificador único.
+  - `code`: Código identificador del servicio.
+  - `lastExecution`: Fecha de la última ejecución.
+
+### 2. `RealGeneration`
+Registra la generación neta real diaria para cada recurso.
+- **Columnas**:
+  - `id`: Identificador único.
+  - `date`: Fecha de generación (Ej: '2024-01-04').
+  - `netGeneration`: Generación neta total en kWh.
+  - `resourceCode`: Código del recurso asociado.
+
+### 3. `RealAvailability`
+Registra la disponibilidad total diaria de cada recurso.
+- **Columnas**:
+  - `id`: Identificador único.
+  - `code`: Código del recurso.
+  - `date`: Fecha del registro.
+  - `totalAvailability`: Disponibilidad total en kW para el día.
+
+### 4. `Resource`
+Lista los recursos y unidades generadoras disponibles en el sistema.
+- **Columnas**:
+  - `id`: Identificador único.
+  - `code`: Código único del recurso.
+  - `name`: Nombre de la planta generadora.
+  - `type`: Tipo de planta (Ej: HIDRAULICA, TERMICA).
+  - `disp`: Estado de despacho (Ej: DESPACHADO, NO DESPACHADO CENTRALMENTE).
+  - `recType`: Tipo de recurso (Ej: GEN. DISTRIBUIDA).
+  - `companyCode`: Código de la compañía propietaria.
+  - `enerSource`: Fuente de energía (Ej: AGUA, VIENTO).
+  - `operStartDate`: Fecha de inicio de operación.
+  - `state`: Estado actual (Ej: OPERACION).
+
+### 5. `TotalDemand`
+Registra la suma total diaria de la demanda eléctrica.
+- **Columnas**:
+  - `id`: Identificador único.
+  - `date`: Fecha del registro.
+  - `totalDemand`: Demanda total diaria.
+
+### 6. `MaxDemand`
+Registra la demanda máxima diaria.
+- **Columnas**:
+  - `id`: Identificador único.
+  - `date`: Fecha del registro.
+  - `maxDemand`: Demanda máxima registrada.
+
+### 7. `RegionalDemand`
+Registra la demanda eléctrica por región.
+- **Columnas**:
+  - `id`: Identificador único.
+  - `date`: Fecha del registro.
+  - `code`: Código de la región.
+  - `marketType`: Tipo de mercado.
+  - `totalDemand`: Demanda total de la región.
+
+### 8. `StockMarketPrice`
+Registra los precios promedio diarios en el mercado eléctrico.
+- **Columnas**:
+  - `id`: Identificador único.
+  - `date`: Fecha del registro.
+  - `price`: Precio promedio en el mercado.
+
+### 9. `MaxOfferPrice`
+Registra el precio máximo diario de ofertas en el mercado eléctrico.
+- **Columnas**:
+  - `id`: Identificador único.
+  - `date`: Fecha del registro.
+  - `maxPrice`: Precio máximo registrado.
+
 ### Principales Servicios
 
 Los servicios incluidos en el proyecto son:
