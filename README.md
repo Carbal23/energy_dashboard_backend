@@ -137,5 +137,5 @@ Este proyecto está licenciado bajo los términos de la licencia [MIT](LICENSE).
 
 ## Autores
 
-- [Tu Nombre]
+- [Mauricio Carbal Martinez]
 
