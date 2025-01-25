@@ -6,7 +6,7 @@ import {
   getLastExecutionDate,
   updateLastExecutionDate,
 } from "../utils/executionLogUtil";
-import { Codes, parametersPerDay } from "../utils/codes";
+import { Codes, parametersPerDay } from "../utils/settings";
 
 configDotenv({ path: "variables.env" });
 
@@ -44,7 +44,7 @@ export class MaxOfferPriceService {
       await updateLastExecutionDate(this.code, maxOfferPriceRepository);
     } else {
       console.log(
-        "Máximo precio de oferta actualizado a fecha de hoy menos 7 días."
+        `Generacion real actualizada a fecha de hoy menos ${safeDate} dias`
       );
     }
   }

@@ -6,7 +6,7 @@ import {
   getLastExecutionDate,
   updateLastExecutionDate,
 } from "../utils/executionLogUtil";
-import { Codes, parametersPerDay } from "../utils/codes";
+import { Codes, parametersPerDay } from "../utils/settings";
 
 configDotenv({ path: "variables.env" });
 
@@ -42,7 +42,7 @@ export class StockMarketPriceService {
       const priceRepository = AppDataSource.getRepository(StockMarketPrice);
       await updateLastExecutionDate(this.code, priceRepository);
     } else {
-      console.log("Precios actualizados a fecha de hoy menos 7 días.");
+      console.log(`Generacion real actualizada a fecha de hoy menos ${safeDate} dias`);
     }
   }
 

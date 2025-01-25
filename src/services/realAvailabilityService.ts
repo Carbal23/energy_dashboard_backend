@@ -6,7 +6,7 @@ import {
   getLastExecutionDate,
   updateLastExecutionDate,
 } from "../utils/executionLogUtil";
-import { Codes, parametersPerDay } from "../utils/codes";
+import { Codes, parametersPerDay } from "../utils/settings";
 
 configDotenv({ path: "variables.env" });
 
@@ -49,12 +49,13 @@ export class RealAvailabilityService {
       }
 
       console.log("Actualización de datos de disponibilidad completada.");
-      
-      const realAvailabilityRepository = AppDataSource.getRepository(RealAvailability);
+
+      const realAvailabilityRepository =
+        AppDataSource.getRepository(RealAvailability);
       await updateLastExecutionDate(this.code, realAvailabilityRepository);
     } else {
       console.log(
-        "Disponibilidad real actualizada a fecha de hoy menos 7 días"
+        `Generacion real actualizada a fecha de hoy menos ${safeDate} dias`
       );
     }
   }

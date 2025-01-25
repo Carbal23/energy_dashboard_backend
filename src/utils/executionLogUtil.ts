@@ -1,6 +1,6 @@
 import { Repository } from "typeorm";
-import { AppDataSource } from "../data-source"
-import { ExecutionLog } from '../entity/ExecutionLog';
+import { AppDataSource } from "../data-source";
+import { ExecutionLog } from "../entity/ExecutionLog";
 
 /**
  * Función para obtener la última fecha de ejecución de un proceso.
@@ -8,16 +8,19 @@ import { ExecutionLog } from '../entity/ExecutionLog';
  * @returns La fecha de la última ejecución o una fecha muy antigua si no hay registros.
  */
 
-const defaultDate =  new Date('2024-09-01'); 
+const defaultDate = new Date("2024-09-01");
 
 export async function getLastExecutionDate(code: string): Promise<Date> {
+  try {
     const executionLogRepository = AppDataSource.getRepository(ExecutionLog);
     const log = await executionLogRepository.findOne({
-        where: { code }
+      where: { code },
     });
     return log ? log.lastExecution : new Date(defaultDate.getTime()); // Si no hay log, devolver fecha por defecto
+  } catch (error) {
+    console.error("Error al obtener la fecha de la última ejecución:", error);
+  }
 }
-
 
 /**
  * Función para actualizar la fecha de la última ejecución de un proceso.
@@ -27,7 +30,7 @@ export async function getLastExecutionDate(code: string): Promise<Date> {
 // Actualizar la fecha de la última ejecución, con o sin una entidad específica
 export async function updateLastExecutionDate<T>(
   code: string,
-  entityRepository?: Repository<T>, // Hacemos que el repositorio sea opcional
+  entityRepository?: Repository<T>, // Repositorio de la entidad
   dateField: string = "date" // Campo de fecha por defecto
 ): Promise<void> {
   const executionLogRepository = AppDataSource.getRepository(ExecutionLog);
@@ -67,5 +70,3 @@ export async function updateLastExecutionDate<T>(
     await executionLogRepository.save(newLog);
   }
 }
-
-  

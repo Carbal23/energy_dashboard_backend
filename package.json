@@ -1,7 +1,7 @@
 {
    "name": "energia-dashboard-backend",
    "version": "0.0.1",
-   "description": "Awesome project developed with TypeORM.",
+   "description": "Backend for Energia Dashboard",
    "type": "commonjs",
    "devDependencies": {
       "@types/node": "^22.7.5",

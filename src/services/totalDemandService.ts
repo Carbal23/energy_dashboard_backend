@@ -6,7 +6,7 @@ import {
   getLastExecutionDate,
   updateLastExecutionDate,
 } from "../utils/executionLogUtil";
-import { Codes, parametersPerDay } from "../utils/codes";
+import { Codes, parametersPerDay } from "../utils/settings";
 
 configDotenv({ path: "variables.env" });
 
@@ -54,7 +54,7 @@ export class TotalDemandService {
       const totalDemandRepository = AppDataSource.getRepository(TotalDemand);
       await updateLastExecutionDate(this.code, totalDemandRepository);
     } else {
-      console.log("Demanda total actualizada a fecha de hoy menos 7 días.");
+      console.log(`Generacion real actualizada a fecha de hoy menos ${safeDate} dias`);
     }
   }
 

@@ -6,7 +6,7 @@ import {
   getLastExecutionDate,
   updateLastExecutionDate,
 } from "../utils/executionLogUtil";
-import { Codes, parametersPerDay } from "../utils/codes";
+import { Codes, parametersPerDay } from "../utils/settings";
 
 configDotenv({ path: "variables.env" });
 
@@ -54,7 +54,7 @@ export class GenerationService {
       const generationRepository = AppDataSource.getRepository(RealGeneration);
       await updateLastExecutionDate(this.code, generationRepository);
     } else {
-      console.log("Generacion real actualizada a fecha de hoy menos 7 dias");
+      console.log(`Generacion real actualizada a fecha de hoy menos ${safeDate} dias`);
     }
   }
 

@@ -3,7 +3,7 @@ import { Resource } from '../entity/Resource';
 import axios from 'axios';
 import { configDotenv } from "dotenv";
 import { getLastExecutionDate, updateLastExecutionDate } from "../utils/executionLogUtil";
-import { Codes } from "../utils/codes";
+import { Codes } from "../utils/settings";
 
 configDotenv({path: 'variables.env'});
 
