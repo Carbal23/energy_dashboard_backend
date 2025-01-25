@@ -2,10 +2,7 @@ import { AppDataSource } from "../data-source";
 import { TotalDemand } from "../entity/TotalDemand"; // Cambiar a la nueva entidad "TotalDemand"
 import axios from "axios";
 import { configDotenv } from "dotenv";
-import {
-  getLastExecutionDate,
-  updateLastExecutionDate,
-} from "../utils/executionLogUtil";
+import { ExecutionLogService } from "./executionLogService";
 import { Codes, parametersPerDay } from "../utils/settings";
 
 configDotenv({ path: "variables.env" });
@@ -14,12 +11,18 @@ export class TotalDemandService {
   private readonly apiUrl =
     process.env.API_URL_HOURLY || "https://servapibi.xm.com.co/hourly"; // URL de la API para demanda
   private readonly code = Codes.totalDemand; // Código para la demanda total, puedes cambiarlo según sea necesario
+  private readonly executionLogService: ExecutionLogService;
   private readonly maxDays = parametersPerDay.maxDays; // Número máximo de días permitidos por la API
   private readonly safeDays = parametersPerDay.safeDays; // Número de días seguros para asegurar que la información está disponible
 
+  constructor() {
+    // Inicializar el atributo executionLogService en el constructor
+    this.executionLogService = new ExecutionLogService();
+}
+
   async checkAndUpdateTotalDemand() {
     // Obtener la última fecha de actualización, si no hay, usar la fecha por defecto
-    let lastUpdate = await getLastExecutionDate(this.code);
+    let lastUpdate = await this.executionLogService.getLastExecutionDate(this.code);
     const currentDate = new Date();
 
     // Definir la fecha límite segura (7 días antes de la fecha actual)
@@ -46,15 +49,16 @@ export class TotalDemandService {
 
         // Establecer lastUpdate como el nuevo endDate para continuar con el siguiente bloque
         lastUpdate.setTime(endDate.getTime() + 86400000); // Incrementar en 1 día
-        
       }
 
       console.log("Actualización de demanda total completada.");
-      
+
       const totalDemandRepository = AppDataSource.getRepository(TotalDemand);
-      await updateLastExecutionDate(this.code, totalDemandRepository);
+      await this.executionLogService.updateLastExecutionDate(this.code, totalDemandRepository);
     } else {
-      console.log(`Generacion real actualizada a fecha de hoy menos ${safeDate} dias`);
+      console.log(
+        `Generacion real actualizada a fecha de hoy menos ${safeDate} dias`
+      );
     }
   }
 

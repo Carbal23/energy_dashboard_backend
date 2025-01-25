@@ -2,10 +2,7 @@ import { AppDataSource } from "../data-source";
 import { StockMarketPrice } from "../entity/StockMarketPrice";
 import axios from "axios";
 import { configDotenv } from "dotenv";
-import {
-  getLastExecutionDate,
-  updateLastExecutionDate,
-} from "../utils/executionLogUtil";
+import { ExecutionLogService } from "./executionLogService";
 import { Codes, parametersPerDay } from "../utils/settings";
 
 configDotenv({ path: "variables.env" });
@@ -14,11 +11,17 @@ export class StockMarketPriceService {
   private readonly apiUrl =
     process.env.API_URL_DAILY || "http://servapibi.xm.com.co/daily"; // URL de la API para precios de bolsa nacional
   private readonly code = Codes.stockMarketPrice; // Código para el precio de bolsa nacional
+  private readonly executionLogService: ExecutionLogService;
   private readonly maxDays = parametersPerDay.maxDays; // Número máximo de días permitidos por la API
   private readonly safeDays = parametersPerDay.safeDays; // Número de días seguros
 
+  constructor() {
+    // Inicializar el atributo executionLogService en el constructor
+    this.executionLogService = new ExecutionLogService();
+}
+
   async checkAndUpdatePrice() {
-    let lastUpdate = await getLastExecutionDate(this.code);
+    let lastUpdate = await this.executionLogService.getLastExecutionDate(this.code);
     const currentDate = new Date();
     const safeDate = new Date(currentDate);
     safeDate.setDate(currentDate.getDate() - this.safeDays); // Fecha segura
@@ -40,9 +43,11 @@ export class StockMarketPriceService {
       console.log("Actualización de precios de bolsa nacional completada.");
 
       const priceRepository = AppDataSource.getRepository(StockMarketPrice);
-      await updateLastExecutionDate(this.code, priceRepository);
+      await this.executionLogService.updateLastExecutionDate(this.code, priceRepository);
     } else {
-      console.log(`Generacion real actualizada a fecha de hoy menos ${safeDate} dias`);
+      console.log(
+        `Generacion real actualizada a fecha de hoy menos ${safeDate} dias`
+      );
     }
   }
 

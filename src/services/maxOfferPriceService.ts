@@ -2,10 +2,7 @@ import { AppDataSource } from "../data-source";
 import { MaxOfferPrice } from "../entity/MaxOfferPrice";
 import axios from "axios";
 import { configDotenv } from "dotenv";
-import {
-  getLastExecutionDate,
-  updateLastExecutionDate,
-} from "../utils/executionLogUtil";
+import { ExecutionLogService } from "./executionLogService";
 import { Codes, parametersPerDay } from "../utils/settings";
 
 configDotenv({ path: "variables.env" });
@@ -14,11 +11,17 @@ export class MaxOfferPriceService {
   private readonly apiUrl =
     process.env.API_URL_HOURLY || "http://servapibi.xm.com.co/hourly"; // URL de la API para máximos precios de oferta
   private readonly code = Codes.maxOfferPrice; // Código para el máximo precio de oferta
+  private readonly executionLogService: ExecutionLogService;
   private readonly maxDays = parametersPerDay.maxDays; // Número máximo de días permitidos por la API
   private readonly safeDays = parametersPerDay.safeDays; // Número de días seguros
 
+  constructor() {
+    // Inicializar el atributo executionLogService en el constructor
+    this.executionLogService = new ExecutionLogService();
+}
+
   async checkAndUpdateMaxOfferPrice() {
-    let lastUpdate = await getLastExecutionDate(this.code);
+    let lastUpdate = await this.executionLogService.getLastExecutionDate(this.code);
     const currentDate = new Date();
     const safeDate = new Date(currentDate);
     safeDate.setDate(currentDate.getDate() - this.safeDays); // Fecha segura
@@ -41,7 +44,7 @@ export class MaxOfferPriceService {
 
       const maxOfferPriceRepository =
         AppDataSource.getRepository(MaxOfferPrice);
-      await updateLastExecutionDate(this.code, maxOfferPriceRepository);
+      await this.executionLogService.updateLastExecutionDate(this.code, maxOfferPriceRepository);
     } else {
       console.log(
         `Generacion real actualizada a fecha de hoy menos ${safeDate} dias`

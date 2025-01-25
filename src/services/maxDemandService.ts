@@ -3,9 +3,8 @@ import { MaxDemand } from "../entity/MaxDemand";
 import axios from "axios";
 import { configDotenv } from "dotenv";
 import {
-  getLastExecutionDate,
-  updateLastExecutionDate,
-} from "../utils/executionLogUtil";
+  ExecutionLogService
+} from "./executionLogService";
 import { Codes, parametersPerDay } from "../utils/settings";
 
 configDotenv({ path: "variables.env" });
@@ -14,11 +13,17 @@ export class MaxDemandService {
   private readonly apiUrl =
     process.env.API_URL_DAILY || "http://servapibi.xm.com.co/daily"; // URL de la API para demanda máxima
   private readonly code = Codes.maxDemand; // Código para la demanda máxima
+  private readonly executionLogService: ExecutionLogService;
   private readonly maxDays = parametersPerDay.maxDays; // Número máximo de días permitidos por la API
   private readonly safeDays = parametersPerDay.safeDays; // Número de días seguros para asegurar que la información está disponible
 
+  constructor() {
+    // Inicializar el atributo executionLogService en el constructor
+    this.executionLogService = new ExecutionLogService();
+}
+
   async checkAndUpdateMaxDemand() {
-    let lastUpdate = await getLastExecutionDate(this.code);
+    let lastUpdate = await this.executionLogService.getLastExecutionDate(this.code);
     const currentDate = new Date();
     const safeDate = new Date(currentDate);
     safeDate.setDate(currentDate.getDate() - this.safeDays); // Fecha segura
@@ -40,7 +45,7 @@ export class MaxDemandService {
       console.log("Actualización de demanda máxima completada.");
 
       const maxDemandRepository = AppDataSource.getRepository(MaxDemand);
-      await updateLastExecutionDate(this.code, maxDemandRepository);
+      await this.executionLogService.updateLastExecutionDate(this.code, maxDemandRepository);
     } else {
       console.log(`Generacion real actualizada a fecha de hoy menos ${safeDate} dias`);
     }

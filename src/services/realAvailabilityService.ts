@@ -2,10 +2,7 @@ import { AppDataSource } from "../data-source";
 import { RealAvailability } from "../entity/RealAvailability";
 import axios from "axios";
 import { configDotenv } from "dotenv";
-import {
-  getLastExecutionDate,
-  updateLastExecutionDate,
-} from "../utils/executionLogUtil";
+import { ExecutionLogService } from "./executionLogService";
 import { Codes, parametersPerDay } from "../utils/settings";
 
 configDotenv({ path: "variables.env" });
@@ -14,12 +11,18 @@ export class RealAvailabilityService {
   private readonly apiUrl =
     process.env.API_URL_HOURLY || "https://servapibi.xm.com.co/hourly"; // URL de la API para disponibilidad
   private readonly code = Codes.availability; // Código para disponibilidad
+  private readonly executionLogService: ExecutionLogService;
   private readonly maxDays = parametersPerDay.maxDays; // Número máximo de días permitidos por la API
   private readonly safeDays = parametersPerDay.safeDays; // Número de días seguros para asegurar que la información está disponible
 
+  constructor() {
+    // Inicializar el atributo executionLogService en el constructor
+    this.executionLogService = new ExecutionLogService();
+}
+
   async checkAndUpdateAvailability() {
     // Obtener la última fecha de actualización, si no hay, usar la fecha por defecto
-    let lastUpdate = await getLastExecutionDate(this.code);
+    let lastUpdate = await this.executionLogService.getLastExecutionDate(this.code);
     const currentDate = new Date();
 
     // Definir la fecha límite segura (7 días antes de la fecha actual)
@@ -52,7 +55,7 @@ export class RealAvailabilityService {
 
       const realAvailabilityRepository =
         AppDataSource.getRepository(RealAvailability);
-      await updateLastExecutionDate(this.code, realAvailabilityRepository);
+      await this.executionLogService.updateLastExecutionDate(this.code, realAvailabilityRepository);
     } else {
       console.log(
         `Generacion real actualizada a fecha de hoy menos ${safeDate} dias`

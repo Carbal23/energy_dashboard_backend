@@ -2,10 +2,7 @@ import { AppDataSource } from "../data-source";
 import { RegionalDemand } from "../entity/RegionalDemand"; // Cambiar a la nueva entidad
 import axios from "axios";
 import { configDotenv } from "dotenv";
-import {
-  getLastExecutionDate,
-  updateLastExecutionDate,
-} from "../utils/executionLogUtil";
+import { ExecutionLogService } from "./executionLogService";
 import { Codes, parametersPerDay } from "../utils/settings";
 
 configDotenv({ path: "variables.env" });
@@ -14,11 +11,17 @@ export class RegionalDemandService {
   private readonly apiUrl =
     process.env.API_URL_HOURLY || "https://servapibi.xm.com.co/hourly"; // URL de la API para demanda por región
   private readonly code = Codes.regionalDemand; // Código para la demanda por región
+  private readonly executionLogService: ExecutionLogService;
   private readonly maxDays = parametersPerDay.maxDays; // Número máximo de días permitidos por la API
   private readonly safeDays = parametersPerDay.safeDays; // Número de días seguros para asegurar que la información está disponible
 
+  constructor() {
+    // Inicializar el atributo executionLogService en el constructor
+    this.executionLogService = new ExecutionLogService();
+}
+
   async checkAndUpdateRegionalDemand() {
-    let lastUpdate = await getLastExecutionDate(this.code);
+    let lastUpdate = await this.executionLogService.getLastExecutionDate(this.code);
     const currentDate = new Date();
     const safeDate = new Date(currentDate);
     safeDate.setDate(currentDate.getDate() - this.safeDays); // Fecha segura
@@ -38,11 +41,14 @@ export class RegionalDemandService {
       }
 
       console.log("Actualización de demanda por región completada.");
-      
-      const regionalDemandRepository = AppDataSource.getRepository(RegionalDemand);
-      await updateLastExecutionDate(this.code, regionalDemandRepository);
+
+      const regionalDemandRepository =
+        AppDataSource.getRepository(RegionalDemand);
+      await this.executionLogService.updateLastExecutionDate(this.code, regionalDemandRepository);
     } else {
-      console.log(`Generacion real actualizada a fecha de hoy menos ${safeDate} dias`);
+      console.log(
+        `Generacion real actualizada a fecha de hoy menos ${safeDate} dias`
+      );
     }
   }
 
@@ -98,7 +104,10 @@ export class RegionalDemandService {
 
       await Promise.all(promises);
     } catch (error) {
-      console.error("Error al actualizar los datos de demanda por región:", error);
+      console.error(
+        "Error al actualizar los datos de demanda por región:",
+        error
+      );
     }
   }
 }

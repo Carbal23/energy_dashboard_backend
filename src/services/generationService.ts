@@ -2,10 +2,7 @@ import { AppDataSource } from "../data-source";
 import { RealGeneration } from "../entity/RealGeneration";
 import axios from "axios";
 import { configDotenv } from "dotenv";
-import {
-  getLastExecutionDate,
-  updateLastExecutionDate,
-} from "../utils/executionLogUtil";
+import { ExecutionLogService } from "./executionLogService";
 import { Codes, parametersPerDay } from "../utils/settings";
 
 configDotenv({ path: "variables.env" });
@@ -14,12 +11,18 @@ export class GenerationService {
   private readonly apiUrl =
     process.env.API_URL_HOURLY || "https://servapibi.xm.com.co/hourly"; // URL de la API para generación
   private readonly code = Codes.generation; // Código para generación, puedes cambiarlo según sea necesario
+  private readonly executionLogService: ExecutionLogService;
   private readonly maxDays = parametersPerDay.maxDays; // Número máximo de días permitidos por la API
   private readonly safeDays = parametersPerDay.safeDays; // Número de días seguros para asegurar que la información está disponible
 
+  constructor() {
+    // Inicializar el atributo executionLogService en el constructor
+    this.executionLogService = new ExecutionLogService();
+}
+
   async checkAndUpdateGeneration() {
     // Obtener la última fecha de actualización, si no hay, usar la fecha por defecto
-    let lastUpdate = await getLastExecutionDate(this.code);
+    let lastUpdate = await this.executionLogService.getLastExecutionDate(this.code);
     const currentDate = new Date();
 
     // Definir la fecha límite segura (7 días antes de la fecha actual)
@@ -46,15 +49,16 @@ export class GenerationService {
 
         // Establecer lastUpdate como el nuevo endDate para continuar con el siguiente bloque
         lastUpdate.setTime(endDate.getTime() + 86400000); // Incrementar en 1 día
-        
       }
 
       console.log("Actualización de datos de generación completada.");
-    
+
       const generationRepository = AppDataSource.getRepository(RealGeneration);
-      await updateLastExecutionDate(this.code, generationRepository);
+      await this.executionLogService.updateLastExecutionDate(this.code, generationRepository);
     } else {
-      console.log(`Generacion real actualizada a fecha de hoy menos ${safeDate} dias`);
+      console.log(
+        `Generacion real actualizada a fecha de hoy menos ${safeDate} dias`
+      );
     }
   }
 
@@ -112,5 +116,4 @@ export class GenerationService {
       console.error("Error al actualizar los datos de generación:", error);
     }
   }
-  
 }
