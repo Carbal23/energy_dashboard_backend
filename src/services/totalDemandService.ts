@@ -3,7 +3,7 @@ import { TotalDemand } from "../entity/TotalDemand"; // Cambiar a la nueva entid
 import axios from "axios";
 import { configDotenv } from "dotenv";
 import { ExecutionLogService } from "./executionLogService";
-import { Codes, parametersPerDay } from "../utils/settings";
+import { Codes, parametersPerDay } from "../settings";
 
 configDotenv({ path: "variables.env" });
 

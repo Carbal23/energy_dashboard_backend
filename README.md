@@ -178,9 +178,9 @@ energia-dashboard-backend/
 ├── src/
 │   ├── entity/         # Modelos de las entidades de la base de datos
 │   ├── services/       # Lógica de los servicios para procesar datos
-│   ├── util/           # Funciones útiles y reutilizables
 │   ├── data-source.ts  # Configuración de la conexión a la base de datos
 │   ├── index.ts        # Punto de entrada principal
+│   ├── settings.ts     # configuraciones
 ├── variables.env       # Variables de entorno
 ├── package.json        # Dependencias y scripts
 ```

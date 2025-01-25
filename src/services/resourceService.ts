@@ -3,7 +3,7 @@ import { Resource } from '../entity/Resource';
 import axios from 'axios';
 import { configDotenv } from "dotenv";
 import { ExecutionLogService } from "./executionLogService";
-import { Codes } from "../utils/settings";
+import { Codes } from "../settings";
 
 configDotenv({ path: 'variables.env' });
 
